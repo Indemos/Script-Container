@@ -15,6 +15,9 @@ Install-Package ScriptContainer -Version 1.0.0-prerelease
 
 # Sample 
 
+The code below is an excerpt. 
+Complete sample can be found in the [Samples](https://github.com/Indemos/ScriptContainer/tree/main/Samples) folder.
+
 ```C#
 @using ScriptContainer
 
