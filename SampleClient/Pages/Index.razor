@@ -1,0 +1,58 @@
+@page "/"
+@using ScriptContainer
+
+<PageTitle>Index</PageTitle>
+
+<h1 @ref="SomeElement">Events</h1>
+
+<ScriptControl @ref="SomeControl"></ScriptControl>
+
+<h2>Document Bounds</h2>
+
+<ul>
+  <li>@DocW</li>
+  <li>@DocH</li>
+</ul>
+
+<h2>Element Bounds</h2>
+
+<ul>
+  <li>@ItemW</li>
+  <li>@ItemH</li>
+</ul>
+
+@code
+{
+  public double DocW { get; set; }
+  public double DocH { get; set; }
+  public double ItemW { get; set; }
+  public double ItemH { get; set; }
+  public ScriptControl SomeControl { get; set; }
+  public ElementReference SomeElement { get; set; }
+
+  protected override async Task OnAfterRenderAsync(bool setup)
+  {
+    if (setup)
+    {
+      SomeControl.OnSize = async message => await GetBounds();
+      SomeControl.OnLoad = async () => await GetBounds();
+    }
+
+    await base.OnAfterRenderAsync(setup);
+  }
+
+  protected async Task GetBounds()
+  {
+    var docBounds = await SomeControl.GetDocBounds();
+
+    DocW = docBounds.Width;
+    DocH = docBounds.Height;
+
+    var itemBounds = await SomeControl.GetElementBounds(SomeElement);
+
+    ItemW = docBounds.Width;
+    ItemH = docBounds.Height;
+
+    await InvokeAsync(StateHasChanged);
+  }
+}
