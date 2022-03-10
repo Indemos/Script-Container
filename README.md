@@ -2,8 +2,8 @@
 
 This RCL library contains .NET wrapper around JS `window.onresize` event and additional methods to get size of the document or specified HTML element. 
 
-- GetDocBounds : get document's width and height 
-- GetElementBounds(ElementReference) : get element's width and height  
+- `GetDocBounds()` - get document's width and height 
+- `GetElementBounds(ElementReference)` - get element's width and height  
 
 Can be used with any Blazor app, either Server side or Wasm.
 
