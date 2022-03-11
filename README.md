@@ -2,8 +2,8 @@
 
 This RCL library contains .NET wrapper around JS `window.onresize` event and additional methods to get size of the document or specified HTML element. 
 
-- GetDocBounds : get document's width and height 
-- GetElementBounds(ElementReference) : get element's width and height  
+- `GetDocBounds()` - get document's width and height 
+- `GetElementBounds(ElementReference)` - get element's width and height  
 
 Can be used with any Blazor app, either Server side or Wasm.
 
@@ -14,6 +14,9 @@ Install-Package ScriptContainer -Version 1.0.1-prerelease
 ```
 
 # Sample 
+
+The code below is an excerpt. 
+Complete sample can be found in the [Samples](https://github.com/Indemos/ScriptContainer/tree/main/Samples) folder.
 
 ```C#
 @using ScriptContainer
