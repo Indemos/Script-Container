@@ -7,15 +7,15 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 
     <Authors>artemiusgreat</Authors>
-    <Description>Generic real-time charts for Web and Desktop apps with built-in pan and zoom support. Financial and stock-trading charts.</Description>
+    <Description>Blazor proxy for missing JS events and methods.</Description>
     <Copyright>http://indemos.com</Copyright>
     <PackageIcon>Icon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/Indemos/ScriptContainer</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Indemos/ScriptContainer</RepositoryUrl>
-    <PackageTags>finance chart opengl canvas trading gdi stock direct2d</PackageTags>
+    <PackageTags>blazor event javascript</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>1.0.0-prerelease</Version>
+    <Version>1.0.1-prerelease</Version>
 
   </PropertyGroup>
 
