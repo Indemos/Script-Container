@@ -15,7 +15,7 @@
     <RepositoryUrl>https://github.com/Indemos/ScriptContainer</RepositoryUrl>
     <PackageTags>blazor event javascript</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>1.0.1-prerelease</Version>
+    <Version>1.0.2-prerelease</Version>
 
   </PropertyGroup>
 

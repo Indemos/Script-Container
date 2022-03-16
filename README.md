@@ -21,26 +21,27 @@ Complete sample can be found in the [Samples](https://github.com/Indemos/ScriptC
 ```C#
 @using ScriptContainer
 
-<ScriptControl @ref="SomeControl"></ScriptControl>
-
 @code
 {
-  public ScriptControl SomeControl { get; set; }
+  public ScriptService ScaleService { get; set; }
 
   protected override async Task OnAfterRenderAsync(bool setup)
   {
     if (setup)
     {
-      SomeControl.OnSize = async message => await GetBounds(); // Subscribe to resize event
-      SomeControl.OnLoad = async () => await GetBounds();      // Subscribe to load event
+      ScaleService = new ScriptService(scriptService);
+
+      await ScaleService.CreateModule();
+      await GetBounds();
+
+      ScaleService.OnSize = async message => await GetBounds();
     }
   }
 
   protected async Task GetBounds()
   {
-    var docBounds = await SomeControl.GetDocBounds();
-    var itemBounds = await SomeControl.GetElementBounds(SomeElement);
-
+    var docBounds = await ScaleService.GetDocBounds();
+    var itemBounds = await ScaleService.GetElementBounds(SomeElement);
   }
 }
 ```
