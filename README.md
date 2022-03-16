@@ -20,6 +20,7 @@ Complete sample can be found in the [Samples](https://github.com/Indemos/ScriptC
 
 ```C#
 @using ScriptContainer
+@inject IJSRuntime scriptService
 
 @code
 {
