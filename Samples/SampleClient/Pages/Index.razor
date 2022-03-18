@@ -4,7 +4,10 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1 @ref="SomeElement">Events</h1>
+<div class="element-container" @ref="ElementA">
+  <div class="element" @ref="ElementA">Element A</div>
+  <div class="element" @ref="ElementB">Element B</div>
+</div>
 
 <h2>Document Bounds</h2>
 
@@ -27,7 +30,8 @@
   public double ItemW { get; set; }
   public double ItemH { get; set; }
   public ScriptService ScaleService { get; set; }
-  public ElementReference SomeElement { get; set; }
+  public ElementReference ElementA { get; set; }
+  public ElementReference ElementB { get; set; }
 
   protected override async Task OnAfterRenderAsync(bool setup)
   {
@@ -51,7 +55,7 @@
     DocW = docBounds.Width;
     DocH = docBounds.Height;
 
-    var itemBounds = await ScaleService.GetElementBounds(SomeElement);
+    var itemBounds = await ScaleService.GetElementBounds(ElementA);
 
     ItemW = docBounds.Width;
     ItemH = docBounds.Height;

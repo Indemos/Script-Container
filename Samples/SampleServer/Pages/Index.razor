@@ -2,23 +2,22 @@
 @using ScriptContainer
 @inject IJSRuntime scriptService
 
-<PageTitle>Index</PageTitle>
-
-<h1 @ref="SomeElement">Events</h1>
-
-<h2>Document Bounds</h2>
-
-<ul>
-  <li>@DocW</li>
-  <li>@DocH</li>
-</ul>
-
-<h2>Element Bounds</h2>
-
-<ul>
-  <li>@ItemW</li>
-  <li>@ItemH</li>
-</ul>
+<div class="element-container" @ref="ElementA">
+  <div class="element" @ref="ElementA">
+    <h2>Document Bounds</h2>
+    <ul>
+      <li>@DocW</li>
+      <li>@DocH</li>
+    </ul>
+  </div>
+  <div class="element" @ref="ElementB">
+    <h2>Element Bounds</h2>
+    <ul>
+      <li>@ItemW</li>
+      <li>@ItemH</li>
+    </ul>
+  </div>
+</div>
 
 @code
 {
@@ -27,7 +26,8 @@
   public double ItemW { get; set; }
   public double ItemH { get; set; }
   public ScriptService ScaleService { get; set; }
-  public ElementReference SomeElement { get; set; }
+  public ElementReference ElementA { get; set; }
+  public ElementReference ElementB { get; set; }
 
   protected override async Task OnAfterRenderAsync(bool setup)
   {
@@ -51,7 +51,8 @@
     DocW = docBounds.Width;
     DocH = docBounds.Height;
 
-    var itemBounds = await ScaleService.GetElementBounds(SomeElement);
+    var itemBoundsA = await ScaleService.GetElementBounds(ElementA);
+    var itemBoundsB = await ScaleService.GetElementBounds(ElementB);
 
     ItemW = docBounds.Width;
     ItemH = docBounds.Height;
