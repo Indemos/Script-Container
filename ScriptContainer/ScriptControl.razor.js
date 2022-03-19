@@ -1,6 +1,8 @@
+window.adapterProcessorInstances = window.adapterProcessorInstances || {};
+
 window.adapterSetProcessorInstance =
   window.adapterSetProcessorInstance ||
-  (instance => window.adapterProcessorInstance = window.adapterProcessorInstance || instance);
+  ((name, instance) => window.adapterProcessorInstances[name] = instance);
 
 window.adapterGetDocBounds =
   window.adapterGetDocBounds ||
@@ -23,7 +25,12 @@ window.adapterGetElementBounds =
 
 window.adapterOnSize =
   window.adapterOnSize ||
-  ((...args) => window.adapterProcessorInstance && window.adapterProcessorInstance.invokeMethodAsync('OnScriptSize', window.adapterGetDocBounds()));
+  ((...args) => {
+  for (let name in window.adapterProcessorInstances) {
+    console.log(name, window.adapterProcessorInstances[name])
+      window.adapterProcessorInstances[name] && window.adapterProcessorInstances[name].invokeMethodAsync('OnScriptSize', window.adapterGetDocBounds());
+    }
+  });
 
 if (window.onresize !== window.adapterOnSize) {
 

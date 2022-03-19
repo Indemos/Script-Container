@@ -67,16 +67,18 @@ namespace ScriptContainer
     }
 
     /// <summary>
-    /// Setup script proxy
+    /// Setup script proxy under specified namespace
     /// </summary>
-    public async Task<ScriptService> CreateModule()
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public async Task<ScriptService> CreateModule(string name = null)
     {
       _scriptModule = _scripts.InvokeAsync<IJSObjectReference>("import", "./_content/ScriptContainer/ScriptControl.razor.js").AsTask();
 
       var instance = DotNetObjectReference.Create(this);
 
       await _scriptModule;
-      await _scripts.InvokeVoidAsync("adapterSetProcessorInstance", instance);
+      await _scripts.InvokeVoidAsync("adapterSetProcessorInstance", name ?? Guid.NewGuid().ToString("N"), instance);
 
       return this;
     }
