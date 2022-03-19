@@ -2,19 +2,26 @@
 @using ScriptContainer
 @inject IJSRuntime scriptService
 
-<div class="element-container" @ref="ElementA">
-  <div class="element" @ref="ElementA">
+<div class="element-container">
+  <div class="doc">
     <h2>Document Bounds</h2>
     <ul>
       <li>@DocW</li>
       <li>@DocH</li>
     </ul>
   </div>
-  <div class="element" @ref="ElementB">
-    <h2>Element Bounds</h2>
+  <div class="element" @ref="ElementA">
+    <h2>Element A Bounds</h2>
     <ul>
-      <li>@ItemW</li>
-      <li>@ItemH</li>
+      <li>@ItemAW</li>
+      <li>@ItemAH</li>
+    </ul>
+  </div>
+  <div class="element element-sm" @ref="ElementB">
+    <h2>Element B Bounds</h2>
+    <ul>
+      <li>@ItemBW</li>
+      <li>@ItemBH</li>
     </ul>
   </div>
 </div>
@@ -23,8 +30,10 @@
 {
   public double DocW { get; set; }
   public double DocH { get; set; }
-  public double ItemW { get; set; }
-  public double ItemH { get; set; }
+  public double ItemAW { get; set; }
+  public double ItemAH { get; set; }
+  public double ItemBW { get; set; }
+  public double ItemBH { get; set; }
   public ScriptService ScaleService { get; set; }
   public ElementReference ElementA { get; set; }
   public ElementReference ElementB { get; set; }
@@ -54,8 +63,10 @@
     var itemBoundsA = await ScaleService.GetElementBounds(ElementA);
     var itemBoundsB = await ScaleService.GetElementBounds(ElementB);
 
-    ItemW = docBounds.Width;
-    ItemH = docBounds.Height;
+    ItemAW = itemBoundsA.Width;
+    ItemAH = itemBoundsA.Height;
+    ItemBW = itemBoundsB.Width;
+    ItemBH = itemBoundsB.Height;
 
     await InvokeAsync(StateHasChanged);
   }

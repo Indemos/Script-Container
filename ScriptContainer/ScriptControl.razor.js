@@ -23,7 +23,7 @@ window.adapterGetElementBounds =
 
 window.adapterOnSize =
   window.adapterOnSize ||
-((...args) => window.adapterProcessorInstance && window.adapterProcessorInstance.invokeMethodAsync('OnScriptSize', window.adapterGetDocBounds()));
+  ((...args) => window.adapterProcessorInstance && window.adapterProcessorInstance.invokeMethodAsync('OnScriptSize', window.adapterGetDocBounds()));
 
 if (window.onresize !== window.adapterOnSize) {
 
