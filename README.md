@@ -27,6 +27,7 @@ Complete sample can be found in the [Samples](https://github.com/Indemos/ScriptC
 @code
 {
   public ScriptService ScaleService { get; set; }
+  public ElementReference SomeElement { get; set; }
 
   protected override async Task OnAfterRenderAsync(bool setup)
   {
