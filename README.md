@@ -22,6 +22,8 @@ Complete sample can be found in the [Samples](https://github.com/Indemos/ScriptC
 @using ScriptContainer
 @inject IJSRuntime scriptService
 
+<div @ref="SomeElement">Demo</div>
+
 @code
 {
   public ScriptService ScaleService { get; set; }
