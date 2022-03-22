@@ -9,7 +9,7 @@ namespace ScriptContainer
   /// <summary>
   /// Singleton service
   /// </summary>
-  public class ScriptService : IDisposable
+  public class ScriptService : IDisposable, IAsyncDisposable
   {
     /// <summary>
     /// Script runtime
@@ -19,7 +19,17 @@ namespace ScriptContainer
     /// <summary>
     /// Script reference
     /// </summary>
-    private Task<IJSObjectReference> _scriptModule = null;
+    private IJSObjectReference _scriptModule = null;
+
+    /// <summary>
+    /// Script instance 
+    /// </summary>
+    private IJSObjectReference _scriptInstance = null;
+
+    /// <summary>
+    /// Service instance 
+    /// </summary>
+    private DotNetObjectReference<ScriptService> _serviceInstance = null;
 
     /// <summary>
     /// Constructor
@@ -41,10 +51,9 @@ namespace ScriptContainer
     /// <returns></returns>
     public async Task<ScriptMessage> GetDocBounds()
     {
-      if (_scriptModule is not null)
+      if (_scriptInstance is not null)
       {
-        await _scriptModule;
-        return await _scripts.InvokeAsync<ScriptMessage>("adapterGetDocBounds");
+        return await _scriptInstance.InvokeAsync<ScriptMessage>("getDocBounds");
       }
 
       return null;
@@ -57,10 +66,9 @@ namespace ScriptContainer
     /// <returns></returns>
     public async Task<ScriptMessage> GetElementBounds(ElementReference element)
     {
-      if (_scriptModule is not null)
+      if (_scriptInstance is not null)
       {
-        await _scriptModule;
-        return await _scripts.InvokeAsync<ScriptMessage>("adapterGetElementBounds", element);
+        return await _scriptInstance.InvokeAsync<ScriptMessage>("getElementBounds", element);
       }
 
       return null;
@@ -69,16 +77,19 @@ namespace ScriptContainer
     /// <summary>
     /// Setup script proxy under specified namespace
     /// </summary>
-    /// <param name="name"></param>
     /// <returns></returns>
-    public async Task<ScriptService> CreateModule(string name = null)
+    public async Task<ScriptService> CreateModule(IDictionary<string, dynamic> options = null)
     {
-      _scriptModule = _scripts.InvokeAsync<IJSObjectReference>("import", "./_content/ScriptContainer/ScriptControl.razor.js").AsTask();
+      options ??= new Dictionary<string, dynamic>();
 
-      var instance = DotNetObjectReference.Create(this);
+      if (options.TryGetValue("interval", out dynamic interval) is false)
+      {
+        options["interval"] = 100;
+      }
 
-      await _scriptModule;
-      await _scripts.InvokeVoidAsync("adapterSetProcessorInstance", name ?? Guid.NewGuid().ToString("N"), instance);
+      _serviceInstance = DotNetObjectReference.Create(this);
+      _scriptModule = await _scripts.InvokeAsync<IJSObjectReference>("import", "./_content/ScriptContainer/ScriptControl.razor.js");
+      _scriptInstance = await _scriptModule.InvokeAsync<IJSObjectReference>("getScriptModule", _serviceInstance, options);
 
       return this;
     }
@@ -102,10 +113,21 @@ namespace ScriptContainer
     /// <summary>
     /// Dispose
     /// </summary>
-    /// <exception cref="NotImplementedException"></exception>
     public void Dispose()
     {
-      _scriptModule?.ContinueWith(o => o.Dispose());
+    }
+
+    /// <summary>
+    /// Dispose
+    /// </summary>
+    /// <returns></returns>
+    public async ValueTask DisposeAsync()
+    {
+      await _scriptInstance.InvokeVoidAsync("dispose");
+      await _scriptInstance.DisposeAsync();
+      await _scriptModule.DisposeAsync();
+
+      _serviceInstance?.Dispose();
     }
   }
 }

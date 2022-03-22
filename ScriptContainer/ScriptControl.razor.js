@@ -1,42 +1,43 @@
-window.adapterProcessorInstances = window.adapterProcessorInstances || {};
+function ScriptModule(instance, options) {
 
-window.adapterSetProcessorInstance =
-  window.adapterSetProcessorInstance ||
-  ((name, instance) => window.adapterProcessorInstances[name] = instance);
+  this.events = [];
+  this.sizeScheduler = null;
+  this.serviceInstance = instance;
 
-window.adapterGetDocBounds =
-  window.adapterGetDocBounds ||
-  (() => {
+  this.getDocBounds = () => {
     return {
       Width: document.body.clientWidth,
       Height: document.body.clientHeight
     };
-  });
+  };
 
-window.adapterGetElementBounds =
-  window.adapterGetElementBounds ||
-  (element => {
+  this.getElementBounds = (element) => {
     const bounds = element.getBoundingClientRect();
     return {
       Width: bounds.width,
       Height: bounds.height
     };
-  });
+  };
 
-window.adapterOnSize =
-  window.adapterOnSize ||
-  ((...args) => {
-  for (let name in window.adapterProcessorInstances) {
-    console.log(name, window.adapterProcessorInstances[name])
-      window.adapterProcessorInstances[name] && window.adapterProcessorInstances[name].invokeMethodAsync('OnScriptSize', window.adapterGetDocBounds());
-    }
-  });
+  this.onSize = (e) => {
+    clearTimeout(this.sizeScheduler);
+    this.sizeScheduler = setTimeout(() => {
+      this.serviceInstance.invokeMethodAsync('OnScriptSize', this.getDocBounds());
+    }, options.interval);
+  };
 
-if (window.onresize !== window.adapterOnSize) {
+  this.subscribe = (element, e, done) => {
+    element.addEventListener(e, done, false);
+    this.events.push({ element, e, done });
+  };
 
-  const scope = (...cbs) => (...inputs) => cbs.forEach(o => o && o(inputs));
+  this.dispose = () => {
+    this.events.forEach(o => o.element.removeEventListener(o.e, o.done));
+  };
 
-  window.adapterOnSize
-    = window.onresize
-    = scope(window.onresize, window.adapterOnSize);
-}
+  this.subscribe(window, 'resize', this.onSize);
+};
+
+export function getScriptModule(instance, options) {
+  return new ScriptModule(instance, options);
+};
