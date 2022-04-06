@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 
 namespace ScriptContainer
@@ -43,7 +44,7 @@ namespace ScriptContainer
     /// <summary>
     /// On size event
     /// </summary>
-    public Action<ScriptMessage> OnSize { get; set; }
+    public BehaviorSubject<ScriptMessage> OnSize { get; set; } = new BehaviorSubject<ScriptMessage>(null);
 
     /// <summary>
     /// Get document bounds
@@ -102,10 +103,7 @@ namespace ScriptContainer
     [JSInvokable]
     public Task<dynamic> OnScriptSize(ScriptMessage message)
     {
-      if (OnSize is not null)
-      {
-        OnSize(message);
-      }
+      OnSize.OnNext(message);
 
       return Task.FromResult<dynamic>(0);
     }

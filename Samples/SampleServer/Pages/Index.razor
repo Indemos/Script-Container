@@ -47,7 +47,7 @@
       await ScaleService.CreateModule();
       await GetBounds();
 
-      ScaleService.OnSize = async message => await GetBounds();
+      ScaleService.OnSize.Subscribe(async message => await GetBounds());
     }
 
     await base.OnAfterRenderAsync(setup);
