@@ -8,7 +8,7 @@
 
   <PropertyGroup>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.0.8-prerelease</Version>
+    <Version>1.0.9-prerelease</Version>
     <Authors>artemiusgreat</Authors>
     <PackageProjectUrl>https://github.com/Indemos/ScriptContainer</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Indemos/ScriptContainer</RepositoryUrl>
@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.0-preview.2.22153.2" />
-    <PackageReference Include="System.Reactive" Version="5.0.0" />
   </ItemGroup>
 
 </Project>
