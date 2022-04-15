@@ -10,7 +10,7 @@ Can be used with any Blazor app, either Server side or Wasm.
 # Nuget
 
 ```
-Install-Package ScriptContainer -Version 1.0.9-prerelease
+Install-Package ScriptContainer
 ```
 
 # Sample 
