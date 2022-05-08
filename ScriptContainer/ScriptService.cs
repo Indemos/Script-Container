@@ -46,6 +46,22 @@ namespace ScriptContainer
     public Action<ScriptMessage> OnSize { get; set; } = o => { };
 
     /// <summary>
+    /// Copy image to canvas
+    /// </summary>
+    /// <param name="canvas"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public async Task<ScriptMessage> SetCanvasImage(ElementReference canvas, string source)
+    {
+      if (_scriptInstance is not null)
+      {
+        return await _scriptInstance.InvokeAsync<ScriptMessage>("setCanvasImage", canvas, source);
+      }
+
+      return null;
+    }
+
+    /// <summary>
     /// Get document bounds
     /// </summary>
     /// <returns></returns>
