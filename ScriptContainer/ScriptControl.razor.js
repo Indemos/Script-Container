@@ -31,16 +31,16 @@ function ScriptModule(instance, options) {
 
   this.getDocBounds = () => {
     return {
-      Width: document.body.clientWidth,
-      Height: document.body.clientHeight
+      X: document.body.clientWidth,
+      Y: document.body.clientHeight
     };
   };
 
   this.getElementBounds = (element) => {
     const bounds = element.getBoundingClientRect();
     return {
-      Width: bounds.width,
-      Height: bounds.height
+      X: bounds.width,
+      Y: bounds.height
     };
   };
 

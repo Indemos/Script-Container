@@ -57,16 +57,16 @@
   {
     var docBounds = await ScaleService.GetDocBounds();
 
-    DocW = docBounds.Width;
-    DocH = docBounds.Height;
+    DocW = docBounds.X;
+    DocH = docBounds.Y;
 
     var itemBoundsA = await ScaleService.GetElementBounds(ElementA);
     var itemBoundsB = await ScaleService.GetElementBounds(ElementB);
 
-    ItemAW = itemBoundsA.Width;
-    ItemAH = itemBoundsA.Height;
-    ItemBW = itemBoundsB.Width;
-    ItemBH = itemBoundsB.Height;
+    ItemAW = itemBoundsA.X;
+    ItemAH = itemBoundsA.Y;
+    ItemBW = itemBoundsB.X;
+    ItemBH = itemBoundsB.Y;
 
     await InvokeAsync(StateHasChanged);
   }
