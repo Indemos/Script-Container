@@ -96,6 +96,8 @@ namespace ScriptContainer
     /// <returns></returns>
     public async Task<ScriptService> CreateModule(IDictionary<string, dynamic> options = null)
     {
+      await DisposeAsync();
+
       options ??= new Dictionary<string, dynamic>();
 
       if (options.TryGetValue("interval", out dynamic interval) is false)
@@ -137,9 +139,16 @@ namespace ScriptContainer
     /// <returns></returns>
     public async ValueTask DisposeAsync()
     {
-      await _scriptInstance.InvokeVoidAsync("dispose");
-      await _scriptInstance.DisposeAsync();
-      await _scriptModule.DisposeAsync();
+      if (_scriptInstance is not null)
+      {
+        await _scriptInstance.InvokeVoidAsync("dispose");
+        await _scriptInstance.DisposeAsync();
+      }
+
+      if (_scriptModule is not null)
+      {
+        await _scriptModule.DisposeAsync();
+      }
 
       _serviceInstance?.Dispose();
     }
