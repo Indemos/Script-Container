@@ -129,9 +129,7 @@ namespace ScriptContainer
     /// <summary>
     /// Dispose
     /// </summary>
-    public void Dispose()
-    {
-    }
+    public void Dispose() => Task.Run(DisposeAsync).GetAwaiter().GetResult();
 
     /// <summary>
     /// Dispose

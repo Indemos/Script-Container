@@ -1,5 +1,6 @@
 @page "/"
 @using ScriptContainer
+@implements IDisposable
 @inject IJSRuntime scriptService
 
 <div class="element-container">
@@ -69,5 +70,10 @@
     ItemBH = itemBoundsB.Y;
 
     await InvokeAsync(StateHasChanged);
+  }
+
+  public void Dispose()
+  {
+    ScaleService?.Dispose();
   }
 }
