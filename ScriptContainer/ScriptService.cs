@@ -46,22 +46,6 @@ namespace ScriptContainer
     public Action<ScriptMessage> OnSize { get; set; } = o => { };
 
     /// <summary>
-    /// Copy image to canvas
-    /// </summary>
-    /// <param name="canvas"></param>
-    /// <param name="source"></param>
-    /// <returns></returns>
-    public async Task<ScriptMessage> SetCanvasImage(ElementReference canvas, string source)
-    {
-      if (_scriptInstance is not null)
-      {
-        return await _scriptInstance.InvokeAsync<ScriptMessage>("setCanvasImage", canvas, source);
-      }
-
-      return null;
-    }
-
-    /// <summary>
     /// Get document bounds
     /// </summary>
     /// <returns></returns>
@@ -94,13 +78,13 @@ namespace ScriptContainer
     /// Setup script proxy under specified namespace
     /// </summary>
     /// <returns></returns>
-    public async Task<ScriptService> CreateModule(IDictionary<string, dynamic> options = null)
+    public async Task<ScriptService> CreateModule(IDictionary<string, object> options = null)
     {
       await DisposeAsync();
 
-      options ??= new Dictionary<string, dynamic>();
+      options ??= new Dictionary<string, object>();
 
-      if (options.TryGetValue("interval", out dynamic interval) is false)
+      if (options.TryGetValue("interval", out var interval) is false)
       {
         options["interval"] = 100;
       }
@@ -118,20 +102,20 @@ namespace ScriptContainer
     /// <param name="message"></param>
     /// <returns></returns>
     [JSInvokable]
-    public Task<dynamic> OnScriptSize(ScriptMessage message)
+    public Task<object> OnScriptSize(ScriptMessage message)
     {
       if (OnSize is not null)
       {
         OnSize(message);
       }
 
-      return Task.FromResult<dynamic>(0);
+      return Task.FromResult<object>(0);
     }
 
     /// <summary>
     /// Dispose
     /// </summary>
-    public void Dispose() => Task.Run(DisposeAsync).GetAwaiter().GetResult();
+    public void Dispose() => Task.Run(DisposeAsync).ConfigureAwait(false).GetAwaiter().GetResult();
 
     /// <summary>
     /// Dispose
@@ -139,18 +123,28 @@ namespace ScriptContainer
     /// <returns></returns>
     public async ValueTask DisposeAsync()
     {
-      if (_scriptInstance is not null)
+      var scriptModule = _scriptModule;
+      var scriptInstance = _scriptInstance;
+      var serviceInstance = _serviceInstance;
+
+      _scriptModule = null;
+      _scriptInstance = null;
+      _serviceInstance = null;
+
+      OnSize = null;
+
+      if (scriptInstance is not null)
       {
-        await _scriptInstance.InvokeVoidAsync("dispose");
-        await _scriptInstance.DisposeAsync();
+        await scriptInstance.InvokeVoidAsync("dispose");
+        await scriptInstance.DisposeAsync();
       }
 
-      if (_scriptModule is not null)
+      if (scriptModule is not null)
       {
-        await _scriptModule.DisposeAsync();
+        await scriptModule.DisposeAsync();
       }
 
-      _serviceInstance?.Dispose();
+      serviceInstance?.Dispose();
     }
   }
 }
