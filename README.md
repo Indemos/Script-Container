@@ -7,11 +7,15 @@ This RCL library contains .NET wrapper around JS `window.onresize` event and add
 
 Can be used with any Blazor app, either Server side or Wasm.
 
-# Nuget
+# Status
 
 ```
 Install-Package ScriptContainer
 ```
+
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/Indemos/Script-Container/dotnet.yml?event=push)
+![GitHub](https://img.shields.io/github/license/Indemos/Script-Container)
+![GitHub](https://img.shields.io/badge/system-Windows%20%7C%20Linux%20%7C%20Mac-blue)
 
 # Sample 
 
