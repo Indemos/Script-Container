@@ -10,10 +10,10 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Version>1.1.7-prerelease</Version>
     <Authors>artemiusgreat</Authors>
-    <PackageProjectUrl>https://github.com/Indemos/ScriptContainer</PackageProjectUrl>
+    <Copyright>indemos.com</Copyright>
+    <PackageProjectUrl>http://indemos.com</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Indemos/ScriptContainer</RepositoryUrl>
     <Description>Blazor proxy for missing JS events and methods.</Description>
-    <Copyright>http://indemos.com</Copyright>
     <PackageTags>blazor event javascript</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
