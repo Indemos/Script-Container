@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\ScriptContainer\ScriptContainer.csproj" />
+    <ProjectReference Include="..\..\Libs\ScriptContainer.csproj" />
   </ItemGroup>
 
 </Project>

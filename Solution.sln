@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32210.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScriptContainer", "ScriptContainer\ScriptContainer.csproj", "{65427EFB-6D3F-4FDE-99A3-32D1D85C7C85}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScriptContainer", "Libs\ScriptContainer.csproj", "{65427EFB-6D3F-4FDE-99A3-32D1D85C7C85}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{8B242F0A-4AC5-45BD-A91E-9C1B5B9AB5EF}"
 EndProject
