@@ -1,6 +1,6 @@
 namespace ScriptContainer
 {
-  public class ScriptMessage
+  public struct ScriptMessage
   {
     public int Interval { get; set; }
     public double X { get; set; }

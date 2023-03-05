@@ -1,9 +1,11 @@
 @page "/"
 @using ScriptContainer
-@implements IDisposable
-@inject IJSRuntime scriptService
+@inject IJSRuntime runtime
 
 <div class="element-container">
+  <button @onclick="Setup">
+    Setup
+  </button>
   <div class="doc">
     <h2>Document Bounds</h2>
     <ul>
@@ -43,37 +45,38 @@
   {
     if (setup)
     {
-      ScaleService = new ScriptService(scriptService);
-
-      await ScaleService.CreateModule();
-      await GetBounds();
-
-      ScaleService.OnSize = async message => await GetBounds();
+      await Setup();
     }
 
     await base.OnAfterRenderAsync(setup);
+  }
+
+  protected async Task Setup()
+  {
+    ScaleService?.DisposeAsync();
+    ScaleService = new ScriptService(runtime);
+
+    await ScaleService.CreateModule();
+    await GetBounds();
+
+    ScaleService.OnSize = async message => await GetBounds();
   }
 
   protected async Task GetBounds()
   {
     var docBounds = await ScaleService.GetDocBounds();
 
-    DocW = docBounds.X;
-    DocH = docBounds.Y;
+    DocW = docBounds.Value.X;
+    DocH = docBounds.Value.Y;
 
     var itemBoundsA = await ScaleService.GetElementBounds(ElementA);
     var itemBoundsB = await ScaleService.GetElementBounds(ElementB);
 
-    ItemAW = itemBoundsA.X;
-    ItemAH = itemBoundsA.Y;
-    ItemBW = itemBoundsB.X;
-    ItemBH = itemBoundsB.Y;
+    ItemAW = itemBoundsA.Value.X;
+    ItemAH = itemBoundsA.Value.Y;
+    ItemBW = itemBoundsB.Value.X;
+    ItemBH = itemBoundsB.Value.Y;
 
     await InvokeAsync(StateHasChanged);
-  }
-
-  public void Dispose()
-  {
-    ScaleService?.Dispose();
   }
 }

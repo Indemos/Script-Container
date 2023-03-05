@@ -9,36 +9,33 @@ namespace ScriptContainer
   /// <summary>
   /// Singleton service
   /// </summary>
-  public class ScriptService : IDisposable, IAsyncDisposable
+  public class ScriptService : IAsyncDisposable
   {
     /// <summary>
     /// Script runtime
     /// </summary>
-    private IJSRuntime _scripts = null;
+    private IJSRuntime _runtime;
 
     /// <summary>
     /// Script reference
     /// </summary>
-    private IJSObjectReference _scriptModule = null;
+    private IJSObjectReference _scriptModule;
 
     /// <summary>
     /// Script instance 
     /// </summary>
-    private IJSObjectReference _scriptInstance = null;
+    private IJSObjectReference _scriptInstance;
 
     /// <summary>
     /// Service instance 
     /// </summary>
-    private DotNetObjectReference<ScriptService> _serviceInstance = null;
+    private DotNetObjectReference<ScriptService> _serviceInstance;
 
     /// <summary>
     /// Constructor
     /// </summary>
-    /// <param name="scripts"></param>
-    public ScriptService(IJSRuntime scripts)
-    {
-      _scripts = scripts;
-    }
+    /// <param name="runtime"></param>
+    public ScriptService(IJSRuntime runtime) => _runtime = runtime;
 
     /// <summary>
     /// On size event
@@ -49,7 +46,7 @@ namespace ScriptContainer
     /// Get document bounds
     /// </summary>
     /// <returns></returns>
-    public async Task<ScriptMessage> GetDocBounds()
+    public async Task<ScriptMessage?> GetDocBounds()
     {
       if (_scriptInstance is not null)
       {
@@ -64,7 +61,7 @@ namespace ScriptContainer
     /// </summary>
     /// <param name="element"></param>
     /// <returns></returns>
-    public async Task<ScriptMessage> GetElementBounds(ElementReference element)
+    public async Task<ScriptMessage?> GetElementBounds(ElementReference element)
     {
       if (_scriptInstance is not null)
       {
@@ -90,7 +87,7 @@ namespace ScriptContainer
       }
 
       _serviceInstance = DotNetObjectReference.Create(this);
-      _scriptModule = await _scripts.InvokeAsync<IJSObjectReference>("import", "./_content/ScriptContainer/ScriptControl.razor.js");
+      _scriptModule = await _runtime.InvokeAsync<IJSObjectReference>("import", "./_content/ScriptContainer/ScriptControl.razor.js");
       _scriptInstance = await _scriptModule.InvokeAsync<IJSObjectReference>("getScriptModule", _serviceInstance, options);
 
       return this;
@@ -102,20 +99,7 @@ namespace ScriptContainer
     /// <param name="message"></param>
     /// <returns></returns>
     [JSInvokable]
-    public Task<object> OnScriptSize(ScriptMessage message)
-    {
-      if (OnSize is not null)
-      {
-        OnSize(message);
-      }
-
-      return Task.FromResult<object>(0);
-    }
-
-    /// <summary>
-    /// Dispose
-    /// </summary>
-    public void Dispose() => Task.Run(DisposeAsync).ConfigureAwait(false).GetAwaiter().GetResult();
+    public void OnSizeChange(ScriptMessage message) => OnSize(message);
 
     /// <summary>
     /// Dispose
@@ -123,28 +107,23 @@ namespace ScriptContainer
     /// <returns></returns>
     public async ValueTask DisposeAsync()
     {
-      var scriptModule = _scriptModule;
-      var scriptInstance = _scriptInstance;
-      var serviceInstance = _serviceInstance;
+      OnSize = o => { };
+
+      if (_scriptInstance is not null)
+      {
+        await _scriptInstance.DisposeAsync();
+      }
+
+      if (_scriptModule is not null)
+      {
+        await _scriptModule.DisposeAsync();
+      }
+
+      _serviceInstance?.Dispose();
 
       _scriptModule = null;
       _scriptInstance = null;
       _serviceInstance = null;
-
-      OnSize = null;
-
-      if (scriptInstance is not null)
-      {
-        await scriptInstance.InvokeVoidAsync("dispose");
-        await scriptInstance.DisposeAsync();
-      }
-
-      if (scriptModule is not null)
-      {
-        await scriptModule.DisposeAsync();
-      }
-
-      serviceInstance?.Dispose();
     }
   }
 }

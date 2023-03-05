@@ -19,10 +19,13 @@ function ScriptModule(instance, options) {
     };
   };
 
-  this.onSize = (e) => {
+  this.onSize = () => {
     clearTimeout(this.sizeScheduler);
     this.sizeScheduler = setTimeout(() => {
-      this.serviceInstance.invokeMethodAsync("OnScriptSize", this.getDocBounds());
+      this
+        .serviceInstance
+        .invokeMethodAsync("OnSizeChange", this.getDocBounds())
+        .catch(o => this.unsubscribe());
     }, options.interval);
   };
 
@@ -31,7 +34,7 @@ function ScriptModule(instance, options) {
     this.events.push({ element, e, done });
   };
 
-  this.dispose = () => {
+  this.unsubscribe = () => {
     this.events.forEach(o => o.element.removeEventListener(o.e, o.done));
   };
 
