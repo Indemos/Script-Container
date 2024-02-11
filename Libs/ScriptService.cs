@@ -2,9 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading.Tasks;
-using static System.Collections.Specialized.BitVector32;
 
 namespace ScriptContainer
 {
@@ -34,15 +32,15 @@ namespace ScriptContainer
     private DotNetObjectReference<ScriptService> _serviceInstance;
 
     /// <summary>
+    /// On size event
+    /// </summary>
+    public Dictionary<string, Action<dynamic>> Actions { get; set; } = new();
+
+    /// <summary>
     /// Constructor
     /// </summary>
     /// <param name="runtime"></param>
     public ScriptService(IJSRuntime runtime) => _runtime = runtime;
-
-    /// <summary>
-    /// On size event
-    /// </summary>
-    public Action<dynamic, int, string> OnChange { get; set; } = (o, i, action) => { };
 
     /// <summary>
     /// Get document bounds
@@ -74,18 +72,49 @@ namespace ScriptContainer
     }
 
     /// <summary>
+    /// Subscribe to custom events
+    /// </summary>
+    /// <param name="element"></param>
+    /// <param name="eventName"></param>
+    /// <param name="actionName"></param>
+    /// <returns></returns>
+    public async Task<string> Subscribe(ElementReference element, string eventName, string actionName)
+    {
+      if (_scriptInstance is not null)
+      {
+        return await _scriptInstance.InvokeAsync<string>("subscribe", element, eventName, actionName);
+      }
+
+      return null;
+    }
+
+    /// <summary>
+    /// Subscribe to size changes
+    /// </summary>
+    /// <param name="element"></param>
+    /// <param name="actionName"></param>
+    /// <returns></returns>
+    public async Task<string> SubscribeToSize(ElementReference element, string actionName)
+    {
+      if (_scriptInstance is not null)
+      {
+        return await _scriptInstance.InvokeAsync<string>("subscribeToSize", element, actionName);
+      }
+
+      return null;
+    }
+
+    /// <summary>
     /// Setup script proxy under specified namespace
     /// </summary>
     /// <returns></returns>
-    public async Task<ScriptService> CreateModule(IDictionary<string, object> options = null)
+    public async Task<ScriptService> CreateModule(IDictionary<string, dynamic> options = null)
     {
       await DisposeAsync();
 
-      options ??= new Dictionary<string, object>();
-
       _serviceInstance = DotNetObjectReference.Create(this);
       _scriptModule = await _runtime.InvokeAsync<IJSObjectReference>("import", "./_content/ScriptContainer/ScriptControl.razor.js");
-      _scriptInstance = await _scriptModule.InvokeAsync<IJSObjectReference>("getScriptModule", _serviceInstance, options);
+      _scriptInstance = await _scriptModule.InvokeAsync<IJSObjectReference>("getScriptModule", _serviceInstance, options ?? new Dictionary<string, object>());
 
       return this;
     }
@@ -94,11 +123,15 @@ namespace ScriptContainer
     /// Script proxy
     /// </summary>
     /// <param name="message"></param>
-    /// <param name="index"></param>
-    /// <param name="action"></param>
+    /// <param name="actionName"></param>
     /// <returns></returns>
     [JSInvokable]
-    public void OnChangeAction(dynamic message, int index, string action) => OnChange(message, index, action);
+    public void OnChange(dynamic message, string actionName)
+    {
+      if (Actions.TryGetValue(actionName, out var action)) {
+        action(message);
+      }
+    }
 
     /// <summary>
     /// Dispose
@@ -106,8 +139,6 @@ namespace ScriptContainer
     /// <returns></returns>
     public async ValueTask DisposeAsync()
     {
-      OnChange = (o, i, action) => { };
-
       if (_scriptInstance is not null)
       {
         await _scriptInstance.DisposeAsync();

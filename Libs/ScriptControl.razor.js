@@ -1,7 +1,9 @@
 function ScriptModule(instance, options) {
 
-  this.events = [];
-  this.sizeObservers = [];
+  const sizeObserverName = "Size";
+
+  this.eventMap = {};
+  this.observerMap = {};
   this.serviceInstance = instance;
 
   /// <summary>
@@ -25,80 +27,71 @@ function ScriptModule(instance, options) {
   /// Subscribe to custom event
   /// </summary>
   /// <param name="element"></param>
-  /// <param name="event"></param>
-  /// <param name="action"></param>
-  this.subscribe = (element, event, action) => {
+  /// <param name="eventName"></param>
+  /// <param name="actionName"></param>
+  this.subscribe = (element, eventName, actionName) => {
     let scheduler = null;
-    let index = this.sizeObservers.length;
-    let change = e => {
+    let done = e => {
       clearTimeout(scheduler);
       scheduler = setTimeout(() => {
         this.serviceInstance && this
           .serviceInstance
-          .invokeMethodAsync(action, e, index, event)
-          .catch(o => this.unsubscribe());
+          .invokeMethodAsync("OnChange", e, actionName)
+          .catch(o => this.unsubscribe(actionName));
       }, options.interval || 100);
     };
-    element.addEventListener(event, change, false);
-    this.events.push({ element, event, change });
-    return this.events.length - 1;
+    element.addEventListener(eventName, done, false);
+    this.eventMap[actionName] = { element, eventName, done };
+    return actionName;
   };
 
   /// <summary>
   /// Unsubscribe from custom event
   /// </summary>
-  /// <param name="index"></param>
-  this.unsubscribe = index => {
-    this.events.forEach((o, i) => {
-      if (this.events[index] || i === index) {
-        o.element.removeEventListener(o.event, o.change);
-        this.events[i] = null;
-      }
-    });
-    this.events = this.events.filter(o => o);
+  /// <param name="actionName"></param>
+  this.unsubscribe = actionName => {
+    const o = this.eventMap[actionName];
+    o && o.element.removeEventListener(o.event, o.done);
+    this.eventMap[actionName] = null;
   };
 
   /// <summary>
   /// Subscribe to element resize
   /// </summary>
   /// <param name="element"></param>
-  /// <param name="action"></param>
-  this.subscribeToSize = (element, action) => {
+  /// <param name="actionName"></param>
+  this.subscribeToSize = (element, actionName) => {
     let scheduler = null;
-    let index = this.sizeObservers.length;
-    let change = e => {
+    let done = e => {
       clearTimeout(scheduler);
       scheduler = setTimeout(() => {
         this.serviceInstance && this
           .serviceInstance
-          .invokeMethodAsync(action, e, index, "resize")
-          .catch(o => this.unsubscribeFromSize());
+          .invokeMethodAsync("OnChange", e, actionName)
+          .catch(o => this.unsubscribeFromSize(actionName));
       }, options.interval || 100);
     };
-    this.sizeObservers.push(new ResizeObserver(change).observe(element));
-    return this.sizeObservers.length - 1;
+    this.observerMap[actionName] = new ResizeObserver(done);
+    this.observerMap[actionName].observe(element);
+    return actionName;
   };
 
   /// <summary>
   /// Unsubscribe from size observer
   /// </summary>
-  /// <param name="index"></param>
-  this.unsubscribeFromSize = index => {
-    this.sizeObservers.forEach((o, i) => {
-      if (this.sizeObservers[index] || i === index) {
-        this.sizeObservers[i].disconnect();
-        this.sizeObservers[i] = null;
-      }
-    });
-    this.sizeObservers = this.sizeObservers.filter(o => o);
+  /// <param name="actionName"></param>
+  this.unsubscribeFromSize = actionName => {
+    const o = this.observerMap[actionName];
+    o && o.disconnect();
+    this.observerMap[actionName] = null;
   };
 
   try {
-    this.unsubscribeFromSize();
-    this.subscribeToSize(document.body, "OnChangeAction");
+    this.unsubscribeFromSize(sizeObserverName);
+    this.subscribeToSize(document.body, sizeObserverName);
   } catch (e) {
-    this.unsubscribe();
-    this.subscribe(window, "resize", "OnChangeAction");
+    this.unsubscribe(sizeObserverName);
+    this.subscribe(window, "resize", sizeObserverName);
   }
 };
 
