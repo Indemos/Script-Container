@@ -8,7 +8,6 @@ html, body {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   height: 100%;
   overflow: auto;
-  display: grid;
 }
 
 main, article, .element-container {

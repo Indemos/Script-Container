@@ -1,44 +1,105 @@
 function ScriptModule(instance, options) {
 
   this.events = [];
-  this.sizeScheduler = null;
+  this.sizeObservers = [];
   this.serviceInstance = instance;
 
-  this.getDocBounds = () => {
-    return {
-      X: document.body.clientWidth,
-      Y: document.body.clientHeight
-    };
-  };
+  /// <summary>
+  /// Get window size
+  /// </summary>
+  this.getDocBounds = () => this.getElementBounds(document.body);
 
-  this.getElementBounds = (element) => {
+  /// <summary>
+  /// Get element size
+  /// </summary>
+  /// <param name="element"></param>
+  this.getElementBounds = element => {
     const bounds = element.getBoundingClientRect();
     return {
-      X: bounds.width,
-      Y: bounds.height
+      X: element.clientWidth || element.scrollWidth || bounds.width,
+      Y: element.clientHeight || element.scrollHeight || bounds.height
     };
   };
 
-  this.onSize = () => {
-    clearTimeout(this.sizeScheduler);
-    this.sizeScheduler = setTimeout(() => {
-      this
-        .serviceInstance
-        .invokeMethodAsync("OnSizeChange", this.getDocBounds())
-        .catch(o => this.unsubscribe());
-    }, options.interval);
+  /// <summary>
+  /// Subscribe to custom event
+  /// </summary>
+  /// <param name="element"></param>
+  /// <param name="event"></param>
+  /// <param name="action"></param>
+  this.subscribe = (element, event, action) => {
+    let scheduler = null;
+    let index = this.sizeObservers.length;
+    let change = e => {
+      clearTimeout(scheduler);
+      scheduler = setTimeout(() => {
+        this.serviceInstance && this
+          .serviceInstance
+          .invokeMethodAsync(action, e, index, event)
+          .catch(o => this.unsubscribe());
+      }, options.interval || 100);
+    };
+    element.addEventListener(event, change, false);
+    this.events.push({ element, event, change });
+    return this.events.length - 1;
   };
 
-  this.subscribe = (element, e, done) => {
-    element.addEventListener(e, done, false);
-    this.events.push({ element, e, done });
+  /// <summary>
+  /// Unsubscribe from custom event
+  /// </summary>
+  /// <param name="index"></param>
+  this.unsubscribe = index => {
+    this.events.forEach((o, i) => {
+      if (this.events[index] || i === index) {
+        o.element.removeEventListener(o.event, o.change);
+        this.events[i] = null;
+      }
+    });
+    this.events = this.events.filter(o => o);
   };
 
-  this.unsubscribe = () => {
-    this.events.forEach(o => o.element.removeEventListener(o.e, o.done));
+  /// <summary>
+  /// Subscribe to element resize
+  /// </summary>
+  /// <param name="element"></param>
+  /// <param name="action"></param>
+  this.subscribeToSize = (element, action) => {
+    let scheduler = null;
+    let index = this.sizeObservers.length;
+    let change = e => {
+      clearTimeout(scheduler);
+      scheduler = setTimeout(() => {
+        this.serviceInstance && this
+          .serviceInstance
+          .invokeMethodAsync(action, e, index, "resize")
+          .catch(o => this.unsubscribeFromSize());
+      }, options.interval || 100);
+    };
+    this.sizeObservers.push(new ResizeObserver(change).observe(element));
+    return this.sizeObservers.length - 1;
   };
 
-  this.subscribe(window, "resize", this.onSize);
+  /// <summary>
+  /// Unsubscribe from size observer
+  /// </summary>
+  /// <param name="index"></param>
+  this.unsubscribeFromSize = index => {
+    this.sizeObservers.forEach((o, i) => {
+      if (this.sizeObservers[index] || i === index) {
+        this.sizeObservers[i].disconnect();
+        this.sizeObservers[i] = null;
+      }
+    });
+    this.sizeObservers = this.sizeObservers.filter(o => o);
+  };
+
+  try {
+    this.unsubscribeFromSize();
+    this.subscribeToSize(document.body, "OnChangeAction");
+  } catch (e) {
+    this.unsubscribe();
+    this.subscribe(window, "resize", "OnChangeAction");
+  }
 };
 
 export function getScriptModule(instance, options) {

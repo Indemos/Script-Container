@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -8,7 +8,7 @@
 
   <PropertyGroup>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.1.9</Version>
+    <Version>1.2.0</Version>
     <Authors>artemiusgreat</Authors>
     <Copyright>indemos.com</Copyright>
     <PackageProjectUrl>http://indemos.com</PackageProjectUrl>

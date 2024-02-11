@@ -3,7 +3,7 @@
 @inject IJSRuntime runtime
 
 <div class="element-container">
-  <button @onclick="Setup">
+  <button @onclick="Increase">
     Setup
   </button>
   <div class="doc">
@@ -27,6 +27,15 @@
       <li>@ItemBH</li>
     </ul>
   </div>
+  @if (Rows.Any())
+  {
+    <ul>
+    @foreach (var row in Rows)
+    {
+      <li>@row</li>
+    }
+    </ul>
+  }
 </div>
 
 @code
@@ -42,6 +51,7 @@
   public ElementReference ElementB { get; set; }
   public ElementReference CanvasA { get; set; }
   public ElementReference CanvasB { get; set; }
+  public IList<string> Rows { get; set; } = new string[0];
 
   protected override async Task OnAfterRenderAsync(bool setup)
   {
@@ -53,6 +63,13 @@
     await base.OnAfterRenderAsync(setup);
   }
 
+  protected void Increase()
+  {
+    Rows = Rows.Any() ?
+      new string[0] : 
+      Enumerable.Range(0, 50).Select(o => $"{o}").ToList();
+  }
+
   protected async Task Setup()
   {
     ScaleService?.DisposeAsync();
@@ -61,7 +78,7 @@
     await ScaleService.CreateModule();
     await GetBounds();
 
-    ScaleService.OnSize = async message => await GetBounds();
+    ScaleService.OnChange = async (message, index, action) => await GetBounds();
   }
 
   protected async Task GetBounds()

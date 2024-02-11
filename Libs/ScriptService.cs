@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
+using static System.Collections.Specialized.BitVector32;
 
 namespace ScriptContainer
 {
@@ -40,7 +42,7 @@ namespace ScriptContainer
     /// <summary>
     /// On size event
     /// </summary>
-    public Action<ScriptMessage> OnSize { get; set; } = o => { };
+    public Action<dynamic, int, string> OnChange { get; set; } = (o, i, action) => { };
 
     /// <summary>
     /// Get document bounds
@@ -81,11 +83,6 @@ namespace ScriptContainer
 
       options ??= new Dictionary<string, object>();
 
-      if (options.TryGetValue("interval", out var interval) is false)
-      {
-        options["interval"] = 100;
-      }
-
       _serviceInstance = DotNetObjectReference.Create(this);
       _scriptModule = await _runtime.InvokeAsync<IJSObjectReference>("import", "./_content/ScriptContainer/ScriptControl.razor.js");
       _scriptInstance = await _scriptModule.InvokeAsync<IJSObjectReference>("getScriptModule", _serviceInstance, options);
@@ -97,9 +94,11 @@ namespace ScriptContainer
     /// Script proxy
     /// </summary>
     /// <param name="message"></param>
+    /// <param name="index"></param>
+    /// <param name="action"></param>
     /// <returns></returns>
     [JSInvokable]
-    public void OnSizeChange(ScriptMessage message) => OnSize(message);
+    public void OnChangeAction(dynamic message, int index, string action) => OnChange(message, index, action);
 
     /// <summary>
     /// Dispose
@@ -107,7 +106,7 @@ namespace ScriptContainer
     /// <returns></returns>
     public async ValueTask DisposeAsync()
     {
-      OnSize = o => { };
+      OnChange = (o, i, action) => { };
 
       if (_scriptInstance is not null)
       {
