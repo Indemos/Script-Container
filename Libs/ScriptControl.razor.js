@@ -17,10 +17,19 @@ function ScriptModule(instance, options) {
   /// <param name="element"></param>
   this.getElementBounds = element => {
     const bounds = element.getBoundingClientRect();
-    return {
-      X: element.clientWidth || element.scrollWidth || bounds.width,
-      Y: element.clientHeight || element.scrollHeight || bounds.height
-    };
+    const X = 
+      element.clientWidth || 
+      element.scrollWidth || 
+      element.offsetWidth || 
+      bounds.width || 
+      0.0;
+    const Y = 
+      element.clientHeight || 
+      element.scrollHeight || 
+      element.offsetHeight || 
+      bounds.height ||
+      0.0;
+    return { X, Y };
   };
 
   /// <summary>
