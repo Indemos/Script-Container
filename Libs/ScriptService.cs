@@ -9,7 +9,7 @@ namespace ScriptContainer
   /// <summary>
   /// Singleton service
   /// </summary>
-  public class ScriptService : IAsyncDisposable
+  public class ScriptService : IDisposable
   {
     /// <summary>
     /// Script runtime
@@ -110,7 +110,7 @@ namespace ScriptContainer
     /// <returns></returns>
     public async Task<ScriptService> CreateModule(IDictionary<string, dynamic> options = null)
     {
-      await DisposeAsync();
+      Dispose();
 
       _serviceInstance = DotNetObjectReference.Create(this);
       _scriptModule = await _runtime.InvokeAsync<IJSObjectReference>("import", "./_content/ScriptContainer/ScriptControl.razor.js");
@@ -131,29 +131,15 @@ namespace ScriptContainer
       if (Actions.TryGetValue(actionName, out var action)) {
         action(message);
       }
-    }
+    } 
 
     /// <summary>
     /// Dispose
     /// </summary>
     /// <returns></returns>
-    public async ValueTask DisposeAsync()
+    public virtual void Dispose()
     {
-      if (_scriptInstance is not null)
-      {
-        await _scriptInstance.DisposeAsync();
-      }
-
-      if (_scriptModule is not null)
-      {
-        await _scriptModule.DisposeAsync();
-      }
-
       _serviceInstance?.Dispose();
-
-      _scriptModule = null;
-      _scriptInstance = null;
-      _serviceInstance = null;
     }
   }
 }

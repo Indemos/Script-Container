@@ -94,14 +94,6 @@ function ScriptModule(instance, options) {
     o && o.disconnect();
     this.observerMap[actionName] = null;
   };
-
-  try {
-    this.unsubscribeFromSize(sizeObserverName);
-    this.subscribeToSize(document.body, sizeObserverName);
-  } catch (e) {
-    this.unsubscribe(sizeObserverName);
-    this.subscribe(window, "resize", sizeObserverName);
-  }
 };
 
 export function getScriptModule(instance, options) {

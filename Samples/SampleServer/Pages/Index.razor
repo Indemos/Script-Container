@@ -72,7 +72,7 @@
 
   protected async Task Setup()
   {
-    ScaleService?.DisposeAsync();
+    ScaleService?.Dispose();
     ScaleService = new ScriptService(runtime);
     ScaleService.Actions[nameof(MessageEnum.Size)] = async message => await GetBounds();
     ScaleService.Actions["Demo"] = async message => await GetBounds();
