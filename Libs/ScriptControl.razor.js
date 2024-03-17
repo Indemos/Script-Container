@@ -17,6 +17,7 @@ function ScriptModule(instance, options) {
   /// <param name="element"></param>
   this.getElementBounds = element => {
     const bounds = element.getBoundingClientRect();
+    console.log(bounds);
     const X = 
       element.clientWidth || 
       element.scrollWidth || 
@@ -97,5 +98,6 @@ function ScriptModule(instance, options) {
 };
 
 export function getScriptModule(instance, options) {
+  console.log(111)
   return new ScriptModule(instance, options);
 };

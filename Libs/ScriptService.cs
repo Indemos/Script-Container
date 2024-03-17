@@ -110,8 +110,6 @@ namespace ScriptContainer
     /// <returns></returns>
     public async Task<ScriptService> CreateModule(IDictionary<string, dynamic> options = null)
     {
-      Dispose();
-
       _serviceInstance = DotNetObjectReference.Create(this);
       _scriptModule = await _runtime.InvokeAsync<IJSObjectReference>("import", "./_content/ScriptContainer/ScriptControl.razor.js");
       _scriptInstance = await _scriptModule.InvokeAsync<IJSObjectReference>("getScriptModule", _serviceInstance, options ?? new Dictionary<string, object>());
@@ -139,7 +137,15 @@ namespace ScriptContainer
     /// <returns></returns>
     public virtual void Dispose()
     {
+      Actions?.Clear();
+
       _serviceInstance?.Dispose();
+      _scriptModule?.DisposeAsync();
+      _scriptInstance?.DisposeAsync();
+
+      _serviceInstance = null;
+      _scriptModule = null;
+      _scriptInstance = null;
     }
   }
 }
