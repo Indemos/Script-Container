@@ -111,7 +111,7 @@ namespace ScriptContainer
     public async Task<ScriptService> CreateModule(IDictionary<string, dynamic> options = null)
     {
       _serviceInstance = DotNetObjectReference.Create(this);
-      _scriptModule = await _runtime.InvokeAsync<IJSObjectReference>("import", "./_content/ScriptContainer/ScriptControl.razor.js");
+      _scriptModule = await _runtime.InvokeAsync<IJSObjectReference>("import", $"./_content/ScriptContainer/ScriptControl.razor.js?{Guid.NewGuid()}");
       _scriptInstance = await _scriptModule.InvokeAsync<IJSObjectReference>("getScriptModule", _serviceInstance, options ?? new Dictionary<string, object>());
 
       return this;
