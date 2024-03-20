@@ -110,9 +110,13 @@ namespace ScriptContainer
     /// <returns></returns>
     public async Task<ScriptService> CreateModule(IDictionary<string, dynamic> options = null)
     {
-      _serviceInstance = DotNetObjectReference.Create(this);
-      _scriptModule = await _runtime.InvokeAsync<IJSObjectReference>("import", $"./_content/ScriptContainer/ScriptControl.razor.js?{Guid.NewGuid()}");
-      _scriptInstance = await _scriptModule.InvokeAsync<IJSObjectReference>("getScriptModule", _serviceInstance, options ?? new Dictionary<string, object>());
+      try
+      {
+        _serviceInstance = DotNetObjectReference.Create(this);
+        _scriptModule = await _runtime.InvokeAsync<IJSObjectReference>("import", $"./_content/ScriptContainer/ScriptControl.razor.js?{Guid.NewGuid()}");
+        _scriptInstance = await _scriptModule.InvokeAsync<IJSObjectReference>("getScriptModule", _serviceInstance, options ?? new Dictionary<string, object>());
+      }
+      catch (Exception) { }
 
       return this;
     }
@@ -126,10 +130,11 @@ namespace ScriptContainer
     [JSInvokable]
     public void OnChange(dynamic message, string actionName)
     {
-      if (Actions.TryGetValue(actionName, out var action)) {
+      if (Actions.TryGetValue(actionName, out var action))
+      {
         action(message);
       }
-    } 
+    }
 
     /// <summary>
     /// Dispose
