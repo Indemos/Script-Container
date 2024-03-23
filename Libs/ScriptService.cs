@@ -120,7 +120,6 @@ namespace ScriptContainer
       }
       catch (Exception)
       {
-        Console.WriteLine($"{e}");
       }
 
       return this;
