@@ -112,11 +112,16 @@ namespace ScriptContainer
     {
       try
       {
+        await DisposeAsync();
+
         _serviceInstance = DotNetObjectReference.Create(this);
-        _scriptModule = await _runtime.InvokeAsync<IJSObjectReference>("import", $"./_content/ScriptContainer/ScriptControl.razor.js?{Guid.NewGuid()}");
-        _scriptInstance = await _scriptModule.InvokeAsync<IJSObjectReference>("getScriptModule", _serviceInstance, options ?? new Dictionary<string, object>());
+        _scriptModule = await _runtime.InvokeAsync<IJSObjectReference>("import", "./_content/ScriptContainer/ScriptControl.razor.js");
+        _scriptInstance = await _scriptModule.InvokeAsync<IJSObjectReference>("getScriptModule", _serviceInstance, options ?? new Dictionary<string, dynamic>());
       }
-      catch (Exception) { }
+      catch (Exception)
+      {
+        Console.WriteLine($"{e}");
+      }
 
       return this;
     }
@@ -140,17 +145,26 @@ namespace ScriptContainer
     /// Dispose
     /// </summary>
     /// <returns></returns>
-    public virtual void Dispose()
+    public virtual void Dispose() => DisposeAsync();
+
+    /// <summary>
+    /// Dispose
+    /// </summary>
+    /// <returns></returns>
+    public virtual Task DisposeAsync()
     {
       Actions?.Clear();
 
       _serviceInstance?.Dispose();
-      _scriptModule?.DisposeAsync();
-      _scriptInstance?.DisposeAsync();
 
-      _serviceInstance = null;
       _scriptModule = null;
       _scriptInstance = null;
+      _serviceInstance = null;
+
+      return Task.WhenAll(
+        _scriptModule is null ? Task.CompletedTask : _scriptModule.DisposeAsync().AsTask(),
+        _scriptInstance is null ? Task.CompletedTask : _scriptInstance.DisposeAsync().AsTask()
+      );
     }
   }
 }

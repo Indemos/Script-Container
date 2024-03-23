@@ -1,102 +1,17 @@
 @page "/"
-@using ScriptContainer
-@inject IJSRuntime runtime
 
-<div class="element-container">
-  <button @onclick="Expand">
-    Setup
-  </button>
-  <div class="doc">
-    <h2>Document Bounds</h2>
-    <ul>
-      <li>@DocW</li>
-      <li>@DocH</li>
-    </ul>
-  </div>
-  <div class="element" @ref="ElementA">
-    <h2>Element A Bounds</h2>
-    <ul>
-      <li>@ItemAW</li>
-      <li>@ItemAH</li>
-    </ul>
-  </div>
-  <div class="element element-sm" @ref="ElementB">
-    <h2>Element B Bounds</h2>
-    <ul>
-      <li>@ItemBW</li>
-      <li>@ItemBH</li>
-    </ul>
-  </div>
-  @if (Rows.Any())
-  {
-    <ul>
-    @foreach (var row in Rows)
-    {
-      <li>@row</li>
-    }
-    </ul>
+<style type="text/css">
+  .container {
+    display: flex;
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
   }
+</style>
+
+<div class="container">
+  <Measures></Measures>
+  <div class="container">
+    <Measures></Measures>
+  </div>
 </div>
-
-@code
-{
-  public double DocW { get; set; }
-  public double DocH { get; set; }
-  public double ItemAW { get; set; }
-  public double ItemAH { get; set; }
-  public double ItemBW { get; set; }
-  public double ItemBH { get; set; }
-  public ScriptService ScaleService { get; set; }
-  public ElementReference ElementA { get; set; }
-  public ElementReference ElementB { get; set; }
-  public ElementReference CanvasA { get; set; }
-  public ElementReference CanvasB { get; set; }
-  public IList<string> Rows { get; set; } = new string[0];
-
-  protected override async Task OnAfterRenderAsync(bool setup)
-  {
-    if (setup)
-    {
-      await Setup();
-    }
-
-    await base.OnAfterRenderAsync(setup);
-  }
-
-  protected void Expand()
-  {
-    Rows = Rows.Any() ?
-      new string[0] : 
-      Enumerable.Range(0, 50).Select(o => $"{o}").ToList();
-  }
-
-  protected async Task Setup()
-  {
-    ScaleService?.Dispose();
-    ScaleService = new ScriptService(runtime);
-    ScaleService.Actions[nameof(MessageEnum.Size)] = async message => await GetBounds();
-    ScaleService.Actions["Demo"] = async message => await GetBounds();
-
-    await ScaleService.CreateModule();
-    await ScaleService.SubscribeToSize(ElementA, "Demo");
-    await GetBounds();
-  }
-
-  protected async Task GetBounds()
-  {
-    var docBounds = await ScaleService.GetDocBounds();
-
-    DocW = docBounds.Value.X;
-    DocH = docBounds.Value.Y;
-
-    var itemBoundsA = await ScaleService.GetElementBounds(ElementA);
-    var itemBoundsB = await ScaleService.GetElementBounds(ElementB);
-
-    ItemAW = itemBoundsA.Value.X;
-    ItemAH = itemBoundsA.Value.Y;
-    ItemBW = itemBoundsB.Value.X;
-    ItemBH = itemBoundsB.Value.Y;
-
-    await InvokeAsync(StateHasChanged);
-  }
-}
